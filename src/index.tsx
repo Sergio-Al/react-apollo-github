@@ -13,28 +13,49 @@ import {
   ApolloClient,
   InMemoryCache,
   ApolloProvider,
-  useQuery,
-  gql,
 } from "@apollo/client";
+import { onError } from "@apollo/client/link/error";
+import { HttpLink } from "@apollo/client/link/http";
+import { ApolloLink } from "@apollo/client";
 
 import { GET_REPOSITORIES_OF_CURRENT_USER } from "./api/requests";
 
 const GITHUB_BASE_URL = "https://api.github.com/graphql";
 
-// Initializing apollo client
-const client = new ApolloClient({
+// Creating a configured HttpLink instance
+const httpLink = new HttpLink({
   uri: GITHUB_BASE_URL,
-  cache: new InMemoryCache(),
   headers: {
     authorization: `Bearer ${process.env.REACT_APP_GITHUB_PERSONAL_ACCESS_TOKEN}`,
   },
 });
 
+// Creating the cache as the place where the data is managed in Apollo Client.
+const cache = new InMemoryCache();
+
+// Handling errors on application level
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors) {
+    // something here...
+  }
+  if (networkError) {
+    // something here...
+  }
+});
+
+// Merging httpLink and errorLink
+const link = ApolloLink.from([errorLink, httpLink]);
+
+// Initializing apollo client
+const client = new ApolloClient({
+  link,
+  cache,
+});
+
 // Example of query
-client
-  .query({
-    query: GET_REPOSITORIES_OF_CURRENT_USER,
-  });
+client.query({
+  query: GET_REPOSITORIES_OF_CURRENT_USER,
+});
 
 ReactDOM.render(
   <React.StrictMode>

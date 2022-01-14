@@ -80,7 +80,7 @@ function CustomApp() {
           )}
         </IconButton>
       </Typography>
-      <Container maxWidth="xl" sx={{my: "12px"}}>
+      <Container maxWidth="xl" sx={{ my: "12px", textAlign: "center" }}>
         <Profile />
       </Container>
     </Box>

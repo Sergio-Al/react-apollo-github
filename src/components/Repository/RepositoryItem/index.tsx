@@ -1,10 +1,16 @@
+import React from "react";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
+import SnackBar from "@mui/material/Snackbar";
+import StarOutlineIcon from "@mui/icons-material/StarOutline";
+import StarIcon from "@mui/icons-material/Star";
 import { NodeEdgesRepository } from "../../../utils/types";
 import { useTheme } from "@mui/system";
+import { STAR_REPOSITORY, REMOVE_STAR_REPOSITORY } from "../../../api/requests";
+import { useMutation } from "@apollo/client";
 
 const MainTitle = styled(Typography)(({ theme }) => {
   return {
@@ -22,7 +28,8 @@ const MainTitle = styled(Typography)(({ theme }) => {
 const CustomBox = styled(Box)(({ theme }) => ({
   padding: "54px 44px",
   maxWidth: "626px",
-  height: "384px",
+  width: "100%",
+  minHeight: "384px",
   background: theme.palette.mode === "light" ? "#ffffff" : "#2b2561",
   boxShadow: "2px 10px 28px -1px rgba(0, 0, 0, 0.25)",
   borderRadius: "60px",
@@ -42,16 +49,95 @@ const CustomInfoBox = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   marginTop: "18px",
-  [theme.breakpoints.down("md")]: {
+  [theme.breakpoints.down("lg")]: {
     flexDirection: "column-reverse",
     alignItems: "start",
     "& > *": { mb: "20px" },
   },
-  [theme.breakpoints.up("md")]: {
+  [theme.breakpoints.up("lg")]: {
     flexDireciton: "row",
     justifyContent: "space-between",
   },
 }));
+
+// const StarButton = styled(Button)(({ theme }) => ({
+
+// }));
+
+function StarButton({
+  onClick,
+  icon,
+  message,
+  loading,
+}: {
+  onClick: React.MouseEventHandler<HTMLButtonElement>;
+  icon: React.ReactNode;
+  message: string;
+  loading: boolean;
+}) {
+  return (
+    <Button onClick={onClick} disabled={loading}>
+      <Box sx={{ display: "flex" }}>
+        {icon}
+        <Typography variant="body1" sx={{ marginLeft: "4px" }}>
+          {message}
+        </Typography>
+      </Box>
+    </Button>
+  );
+}
+
+function AddStar({ id }: { id: string }) {
+  const [addStar, { data, loading, error }] = useMutation(STAR_REPOSITORY);
+  console.log("Add star fired!");
+
+  if (error)
+    return (
+      <SnackBar
+        open
+        autoHideDuration={3000}
+        message={`An error have ocurred`}
+      />
+    );
+
+  return (
+    <>
+      <StarButton
+        onClick={(e) => addStar({ variables: { id } })}
+        loading={loading}
+        icon={<StarOutlineIcon />}
+        message="Star"
+      />
+    </>
+  );
+}
+
+function RemoveStar({ id }: { id: string }) {
+  const [removeStar, { data, loading, error }] = useMutation(
+    REMOVE_STAR_REPOSITORY
+  );
+  console.log("remove star fired!");
+
+  if (error)
+    return (
+      <SnackBar
+        open
+        autoHideDuration={3000}
+        message={`An error have ocurred`}
+      />
+    );
+
+  return (
+    <>
+      <StarButton
+        onClick={(e) => removeStar({ variables: { id } })}
+        loading={loading}
+        icon={<StarIcon />}
+        message="Starred"
+      />
+    </>
+  );
+}
 
 export default function RepositoryItem({
   id,
@@ -67,47 +153,64 @@ export default function RepositoryItem({
 }: NodeEdgesRepository) {
   const theme = useTheme(); // for extract the theme.palette.mode in sx prop
   return (
-    <CustomBox>
-      <Box>
-        <Box sx={{ mb: "18px" }}>
-          <MainTitle gutterBottom>{name}</MainTitle>
-          <Typography
-            variant="caption"
+    <Box sx={{ display: "flex", justifyContent: "center" }}>
+      <CustomBox>
+        <Box textAlign="start">
+          <Box sx={{ mb: "18px" }}>
+            <MainTitle gutterBottom>{name}</MainTitle>
+            <Typography
+              variant="caption"
+              sx={{
+                fontSize: "18px",
+                color: theme.palette.mode === "light" ? "#454545" : "#ffffff",
+              }}
+              gutterBottom
+            >
+              {primaryLanguage.name}
+            </Typography>
+          </Box>
+          <Box
             sx={{
-              fontSize: "18px",
-              color: theme.palette.mode === "light" ? "#454545" : "#ffffff",
+              fontStyle: "normal",
+              fontWeight: "300",
+              fontSize: "24px",
+              lineHeight: "28px",
             }}
-            gutterBottom
           >
-            {primaryLanguage.name}
-          </Typography>
+            <div dangerouslySetInnerHTML={{ __html: descriptionHTML }} />
+          </Box>
         </Box>
-        <Typography
-          sx={{
-            fontStyle: "normal",
-            fontWeight: "300",
-            fontSize: "24px",
-            lineHeight: "28px",
-          }}
-        >
-          <div dangerouslySetInnerHTML={{ __html: descriptionHTML }} />
-        </Typography>
-      </Box>
 
-      <CustomInfoBox>
-        <Link>
-          <Button variant="contained" sx={{ width: "166px", height: "45px" }}>
-            VISIT
-          </Button>
-        </Link>
-        <Link href={owner.url}>Owner</Link>
-        {stargazers.totalCount}
-        <Typography variant="body1">
-          {viewerHasStarred ? "is Starred" : "not starred"}
-        </Typography>
-        <Typography variant="body1">{viewerSubscription}</Typography>
-        <Typography variant="body2">{watchers.totalCount}</Typography>
-      </CustomInfoBox>
-    </CustomBox>
+        <CustomInfoBox>
+          <Link href={url} underline="none" target="_blank" rel="noreferrer">
+            <Button variant="contained" sx={{ width: "166px", height: "45px" }}>
+              VISIT
+            </Button>
+          </Link>
+          <Link
+            href={owner.url}
+            underline="none"
+            target="_blank"
+            rel="noreferrer"
+            sx={{
+              color: "#8d6a00",
+              transition: "50ms all ease-in",
+              "&:hover": {
+                transform: "scale(1.1)",
+                fontWeight: "500",
+                color: theme.palette.mode === "light" ? "#000" : "#fff",
+              },
+            }}
+          >
+            Owner
+          </Link>
+          {viewerHasStarred ? <RemoveStar id={id} /> : <AddStar id={id} />}
+          <Typography variant="body1">{viewerSubscription}</Typography>
+          <Typography variant="body2">
+            Watchers: {watchers.totalCount}
+          </Typography>
+        </CustomInfoBox>
+      </CustomBox>
+    </Box>
   );
 }
