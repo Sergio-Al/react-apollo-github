@@ -26,7 +26,7 @@ export type NodeEdgesRepository = {
   stargazers: StargazersNodeEdgesRepository;
   url: string;
   viewerHasStarred: boolean;
-  viewerSubscription: string;
+  viewerSubscription: "SUBSCRIBED" | "UNSUBSCRIBED" | "IGNORED";
   watchers: WatchersNodeEdgesRepository;
 };
 

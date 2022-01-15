@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
@@ -7,9 +7,17 @@ import Link from "@mui/material/Link";
 import SnackBar from "@mui/material/Snackbar";
 import StarOutlineIcon from "@mui/icons-material/StarOutline";
 import StarIcon from "@mui/icons-material/Star";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 import { NodeEdgesRepository } from "../../../utils/types";
 import { useTheme } from "@mui/system";
-import { STAR_REPOSITORY, REMOVE_STAR_REPOSITORY } from "../../../api/requests";
+import {
+  STAR_REPOSITORY,
+  REMOVE_STAR_REPOSITORY,
+  SUBSCRIBE_REPO,
+  UNSUBSCRIBE_REPO,
+  IGNORE_REPO,
+} from "../../../api/requests";
 import { useMutation } from "@apollo/client";
 
 const MainTitle = styled(Typography)(({ theme }) => {
@@ -60,10 +68,6 @@ const CustomInfoBox = styled(Box)(({ theme }) => ({
   },
 }));
 
-// const StarButton = styled(Button)(({ theme }) => ({
-
-// }));
-
 function StarButton({
   onClick,
   icon,
@@ -87,9 +91,96 @@ function StarButton({
   );
 }
 
+function SubscribeButton({
+  id,
+  message,
+}: {
+  id: string;
+  message: "SUBSCRIBED" | "UNSUBSCRIBED" | "IGNORED";
+}) {
+  const [
+    subscribeUpdate,
+    { loading: loadingSubscribe, error: errorSubscribe },
+  ] = useMutation(SUBSCRIBE_REPO);
+  const [
+    unsubscribeUpdate,
+    { loading: loadingUnubscribe, error: errorUnsubscribe },
+  ] = useMutation(UNSUBSCRIBE_REPO);
+  const [ignoreRepoUpdate, { loading: loadingIgnore, error: errorIgnore }] =
+    useMutation(IGNORE_REPO);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  if (errorSubscribe || errorUnsubscribe || errorIgnore) {
+    return (
+      <SnackBar
+        open
+        autoHideDuration={3000}
+        message={`An error have ocurred ${
+          errorSubscribe?.message ||
+          errorUnsubscribe?.message ||
+          errorIgnore?.message
+        }`}
+      />
+    );
+  }
+
+  return (
+    <>
+      <Button
+        aria-haspopup="true"
+        onClick={handleClick}
+        disabled={loadingSubscribe || loadingUnubscribe || loadingIgnore}
+      >
+        <Typography variant="body1">{message}</Typography>
+      </Button>
+      <Menu
+        id="subscribe-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        MenuListProps={{
+          "aria-labelledby": "subscribe-button",
+        }}
+      >
+        <MenuItem
+          onClick={() => {
+            setAnchorEl(null);
+            subscribeUpdate({ variables: { id } });
+          }}
+        >
+          Subscribe
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            setAnchorEl(null);
+            unsubscribeUpdate({ variables: { id } });
+          }}
+        >
+          Unsubscribe
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            setAnchorEl(null);
+            ignoreRepoUpdate({ variables: { id } });
+          }}
+        >
+          Ignores
+        </MenuItem>
+      </Menu>
+    </>
+  );
+}
+
 function AddStar({ id }: { id: string }) {
-  const [addStar, { data, loading, error }] = useMutation(STAR_REPOSITORY);
-  console.log("Add star fired!");
+  const [addStar, { loading, error }] = useMutation(STAR_REPOSITORY);
 
   if (error)
     return (
@@ -113,9 +204,7 @@ function AddStar({ id }: { id: string }) {
 }
 
 function RemoveStar({ id }: { id: string }) {
-  const [removeStar, { data, loading, error }] = useMutation(
-    REMOVE_STAR_REPOSITORY
-  );
+  const [removeStar, { loading, error }] = useMutation(REMOVE_STAR_REPOSITORY);
   console.log("remove star fired!");
 
   if (error)
@@ -205,7 +294,7 @@ export default function RepositoryItem({
             Owner
           </Link>
           {viewerHasStarred ? <RemoveStar id={id} /> : <AddStar id={id} />}
-          <Typography variant="body1">{viewerSubscription}</Typography>
+          <SubscribeButton id={id} message={viewerSubscription} />
           <Typography variant="body2">
             Watchers: {watchers.totalCount}
           </Typography>

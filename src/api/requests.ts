@@ -62,3 +62,36 @@ export const REMOVE_STAR_REPOSITORY = gql`
     }
   }
 `;
+
+export const SUBSCRIBE_REPO = gql`
+  mutation SubscribeRepo($id: ID!) {
+    updateSubscription(input: { state: SUBSCRIBED, subscribableId: $id }) {
+      subscribable {
+        viewerSubscription
+        id
+      }
+    }
+  }
+`;
+
+export const UNSUBSCRIBE_REPO = gql`
+  mutation SubscribeRepo($id: ID!) {
+    updateSubscription(input: { state: UNSUBSCRIBED, subscribableId: $id }) {
+      subscribable {
+        viewerSubscription
+        id
+      }
+    }
+  }
+`;
+
+export const IGNORE_REPO = gql`
+  mutation SubscribeRepo($id: ID!) {
+    updateSubscription(input: { state: IGNORED, subscribableId: $id }) {
+      subscribable {
+        viewerSubscription
+        id
+      }
+    }
+  }
+`;

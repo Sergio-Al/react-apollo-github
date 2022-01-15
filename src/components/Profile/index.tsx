@@ -1,6 +1,5 @@
 import { useQuery } from "@apollo/client";
 import { GET_REPOSITORIES_OF_CURRENT_USER } from "../../api/requests";
-import Typography from "@mui/material/Typography";
 import SkeletonProfile from "./Skeleton";
 import RepositoryList from "../Repository/RepositoryList";
 import { Box } from "@mui/material";
