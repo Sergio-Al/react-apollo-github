@@ -55,15 +55,13 @@ const CustomBox = styled(Box)(({ theme }) => ({
 
 const CustomInfoBox = styled(Box)(({ theme }) => ({
   display: "flex",
-  alignItems: "center",
+  alignItems: "start",
   marginTop: "18px",
+  flexDirection: "column-reverse",
   [theme.breakpoints.down("lg")]: {
-    flexDirection: "column-reverse",
-    alignItems: "start",
     "& > *": { mb: "20px" },
   },
   [theme.breakpoints.up("lg")]: {
-    flexDireciton: "row",
     justifyContent: "space-between",
   },
 }));
@@ -291,12 +289,15 @@ export default function RepositoryItem({
               },
             }}
           >
-            Owner
+            <Button>Owner</Button>
           </Link>
           {viewerHasStarred ? <RemoveStar id={id} /> : <AddStar id={id} />}
           <SubscribeButton id={id} message={viewerSubscription} />
           <Typography variant="body2">
             Watchers: {watchers.totalCount}
+          </Typography>
+          <Typography variant="body2">
+            Stargazers: {stargazers.totalCount}
           </Typography>
         </CustomInfoBox>
       </CustomBox>

@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { REPOSITORY_FRAGMENT } from "./fragments";
 
 export const GET_CURRENT_USER = gql`
   {
@@ -15,30 +16,13 @@ export const GET_REPOSITORIES_OF_CURRENT_USER = gql`
       repositories(first: 5, orderBy: { direction: DESC, field: STARGAZERS }) {
         edges {
           node {
-            id
-            name
-            url
-            descriptionHTML
-            primaryLanguage {
-              name
-            }
-            owner {
-              login
-              url
-            }
-            stargazers {
-              totalCount
-            }
-            viewerHasStarred
-            watchers {
-              totalCount
-            }
-            viewerSubscription
+            ...repository
           }
         }
       }
     }
   }
+  ${REPOSITORY_FRAGMENT}
 `;
 
 export const STAR_REPOSITORY = gql`
@@ -47,6 +31,12 @@ export const STAR_REPOSITORY = gql`
       starrable {
         id
         viewerHasStarred
+        ... on Repository {
+          id
+          stargazers {
+            totalCount
+          }
+        }
       }
     }
   }
@@ -58,6 +48,12 @@ export const REMOVE_STAR_REPOSITORY = gql`
       starrable {
         id
         viewerHasStarred
+        ... on Repository {
+          id
+          stargazers {
+            totalCount
+          }
+        }
       }
     }
   }
