@@ -9,14 +9,15 @@ import StarOutlineIcon from "@mui/icons-material/StarOutline";
 import StarIcon from "@mui/icons-material/Star";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import { NodeEdgesRepository } from "../../../utils/types";
+import {
+  NodeEdgesRepository,
+  viewerSubscriptionStatuses,
+} from "../../../utils/types";
 import { useTheme } from "@mui/system";
 import {
   STAR_REPOSITORY,
   REMOVE_STAR_REPOSITORY,
-  SUBSCRIBE_REPO,
-  UNSUBSCRIBE_REPO,
-  IGNORE_REPO,
+  SUBSCRIBE_REPO_HANDLING,
 } from "../../../api/requests";
 import { useMutation } from "@apollo/client";
 
@@ -94,49 +95,45 @@ function SubscribeButton({
   message,
 }: {
   id: string;
-  message: "SUBSCRIBED" | "UNSUBSCRIBED" | "IGNORED";
+  message: viewerSubscriptionStatuses;
 }) {
-  const [
-    subscribeUpdate,
-    { loading: loadingSubscribe, error: errorSubscribe },
-  ] = useMutation(SUBSCRIBE_REPO);
-  const [
-    unsubscribeUpdate,
-    { loading: loadingUnubscribe, error: errorUnsubscribe },
-  ] = useMutation(UNSUBSCRIBE_REPO);
-  const [ignoreRepoUpdate, { loading: loadingIgnore, error: errorIgnore }] =
-    useMutation(IGNORE_REPO);
+  const [openError, setOpenError] = useState(false);
+  const [subscribeUpdate, { loading, error }] = useMutation(
+    SUBSCRIBE_REPO_HANDLING,
+    {
+      onError: () => setOpenError(true),
+    }
+  );
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
+  const handleItemClick = (subscribeState: viewerSubscriptionStatuses) => {
+    setAnchorEl(null);
+    subscribeUpdate({
+      variables: { id, subscribeState },
+      optimisticResponse: {
+        updateSubscription: {
+          subscribable: {
+            viewerSubscription: subscribeState,
+            id,
+            __typename: "Repository",
+          },
+          __typename: "UpdateSubscriptionPayload",
+        },
+      },
+    });
+  };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
 
-  if (errorSubscribe || errorUnsubscribe || errorIgnore) {
-    return (
-      <SnackBar
-        open
-        autoHideDuration={3000}
-        message={`An error have ocurred ${
-          errorSubscribe?.message ||
-          errorUnsubscribe?.message ||
-          errorIgnore?.message
-        }`}
-      />
-    );
-  }
-
   return (
     <>
-      <Button
-        aria-haspopup="true"
-        onClick={handleClick}
-        disabled={loadingSubscribe || loadingUnubscribe || loadingIgnore}
-      >
+      <Button aria-haspopup="true" onClick={handleClick} disabled={loading}>
         <Typography variant="body1">{message}</Typography>
       </Button>
       <Menu
@@ -148,31 +145,22 @@ function SubscribeButton({
           "aria-labelledby": "subscribe-button",
         }}
       >
-        <MenuItem
-          onClick={() => {
-            setAnchorEl(null);
-            subscribeUpdate({ variables: { id } });
-          }}
-        >
+        <MenuItem onClick={() => handleItemClick("SUBSCRIBED")}>
           Subscribe
         </MenuItem>
-        <MenuItem
-          onClick={() => {
-            setAnchorEl(null);
-            unsubscribeUpdate({ variables: { id } });
-          }}
-        >
+        <MenuItem onClick={() => handleItemClick("UNSUBSCRIBED")}>
           Unsubscribe
         </MenuItem>
-        <MenuItem
-          onClick={() => {
-            setAnchorEl(null);
-            ignoreRepoUpdate({ variables: { id } });
-          }}
-        >
-          Ignores
-        </MenuItem>
+        <MenuItem onClick={() => handleItemClick("IGNORED")}>Ignores</MenuItem>
       </Menu>
+      {error && (
+        <SnackBar
+          open={openError}
+          autoHideDuration={3000}
+          message={`An error have ocurred`}
+          onClose={() => setOpenError(false)}
+        />
+      )}
     </>
   );
 }

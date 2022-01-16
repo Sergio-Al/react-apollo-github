@@ -17,6 +17,11 @@ export type OwnerNodeEdgesRepository = {
   url: string;
 };
 
+export type viewerSubscriptionStatuses =
+  | "SUBSCRIBED"
+  | "UNSUBSCRIBED"
+  | "IGNORED";
+
 export type NodeEdgesRepository = {
   id: string;
   name: string;
@@ -26,7 +31,7 @@ export type NodeEdgesRepository = {
   stargazers: StargazersNodeEdgesRepository;
   url: string;
   viewerHasStarred: boolean;
-  viewerSubscription: "SUBSCRIBED" | "UNSUBSCRIBED" | "IGNORED";
+  viewerSubscription: viewerSubscriptionStatuses;
   watchers: WatchersNodeEdgesRepository;
 };
 
