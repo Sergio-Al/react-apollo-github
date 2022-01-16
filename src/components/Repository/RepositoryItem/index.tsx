@@ -177,8 +177,11 @@ function SubscribeButton({
   );
 }
 
-function AddStar({ id }: { id: string }) {
-  const [addStar, { loading, error }] = useMutation(STAR_REPOSITORY);
+function AddStar({ id, stargazers }: { id: string; stargazers: number }) {
+  const [open, setOpen] = useState(false);
+  const [addStar, { loading, error }] = useMutation(STAR_REPOSITORY, {
+    onError: () => setOpen(true),
+  });
 
   if (error)
     return (
@@ -192,36 +195,82 @@ function AddStar({ id }: { id: string }) {
   return (
     <>
       <StarButton
-        onClick={(e) => addStar({ variables: { id } })}
+        onClick={(e) =>
+          addStar({
+            variables: { id },
+            optimisticResponse: {
+              addStar: {
+                starrable: {
+                  id,
+                  viewerHasStarred: true,
+                  stargazers: {
+                    totalCount: stargazers + 1,
+                    __typename: "StargazersConnection",
+                  },
+                  __typename: "Repository",
+                },
+              },
+              __typename: "RemoveStarPayload",
+            },
+          })
+        }
         loading={loading}
         icon={<StarOutlineIcon />}
         message="Star"
       />
+      {error && (
+        <SnackBar
+          open={open}
+          autoHideDuration={3000}
+          message={`An error have ocurred`}
+          onClose={() => setOpen(false)}
+        />
+      )}
     </>
   );
 }
 
-function RemoveStar({ id }: { id: string }) {
-  const [removeStar, { loading, error }] = useMutation(REMOVE_STAR_REPOSITORY);
+function RemoveStar({ id, stargazers }: { id: string; stargazers: number }) {
+  const [open, setOpen] = useState(false);
+  const [removeStar, { loading, error }] = useMutation(REMOVE_STAR_REPOSITORY, {
+    onError: () => setOpen(true),
+  });
   console.log("remove star fired!");
-
-  if (error)
-    return (
-      <SnackBar
-        open
-        autoHideDuration={3000}
-        message={`An error have ocurred`}
-      />
-    );
 
   return (
     <>
       <StarButton
-        onClick={(e) => removeStar({ variables: { id } })}
+        onClick={(e) =>
+          removeStar({
+            variables: { id },
+            optimisticResponse: {
+              removeStar: {
+                starrable: {
+                  id,
+                  viewerHasStarred: false,
+                  stargazers: {
+                    totalCount: stargazers - 1,
+                    __typename: "StargazersConnection",
+                  },
+                  __typename: "Repository",
+                },
+              },
+              __typename: "RemoveStarPayload",
+            },
+          })
+        }
         loading={loading}
         icon={<StarIcon />}
         message="Starred"
       />
+      {error && (
+        <SnackBar
+          open={open}
+          autoHideDuration={3000}
+          message={`An error have ocurred`}
+          onClose={() => setOpen(false)}
+        />
+      )}
     </>
   );
 }
@@ -291,7 +340,11 @@ export default function RepositoryItem({
           >
             <Button>Owner</Button>
           </Link>
-          {viewerHasStarred ? <RemoveStar id={id} /> : <AddStar id={id} />}
+          {viewerHasStarred ? (
+            <RemoveStar id={id} stargazers={stargazers.totalCount} />
+          ) : (
+            <AddStar id={id} stargazers={stargazers.totalCount} />
+          )}
           <SubscribeButton id={id} message={viewerSubscription} />
           <Typography variant="body2">
             Watchers: {watchers.totalCount}
