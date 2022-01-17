@@ -15,6 +15,7 @@ import { HttpLink } from "@apollo/client/link/http";
 import { ApolloLink } from "@apollo/client";
 
 import { GET_REPOSITORIES_OF_CURRENT_USER } from "./api/requests";
+import { relayStylePagination } from "@apollo/client/utilities";
 
 const GITHUB_BASE_URL = "https://api.github.com/graphql";
 
@@ -29,14 +30,9 @@ const httpLink = new HttpLink({
 // Creating the cache as the place where the data is managed in Apollo Client.
 const cache = new InMemoryCache({
   typePolicies: {
-    Query: {
+    User: {
       fields: {
-        viewer: {
-          merge(existing = {}, incoming) {
-            console.log(Object.keys(incoming));
-            return { ...existing, ...incoming };
-          },
-        },
+        repositories: relayStylePagination(),
       },
     },
   },
