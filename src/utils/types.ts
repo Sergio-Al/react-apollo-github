@@ -39,6 +39,12 @@ export type EdgesRepository = {
   node: NodeEdgesRepository;
 };
 
+export type PageInfoRepository = {
+  endCursor: string;
+  hasNextPage: boolean;
+};
+
 export type Repositories = {
   edges: Array<EdgesRepository>;
+  pageInfo: PageInfoRepository;
 };

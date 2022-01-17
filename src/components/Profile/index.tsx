@@ -6,7 +6,9 @@ import { Box } from "@mui/material";
 import Error from "../Error";
 
 export default function Profile() {
-  const { loading, error, data } = useQuery(GET_REPOSITORIES_OF_CURRENT_USER);
+  const { loading, error, data, fetchMore } = useQuery(
+    GET_REPOSITORIES_OF_CURRENT_USER
+  );
 
   if (loading) return <SkeletonProfile />;
   if (error) return <Error error={error} />;
@@ -15,7 +17,10 @@ export default function Profile() {
   let { viewer } = data;
   return (
     <Box>
-      <RepositoryList edges={viewer.repositories.edges} />
+      <RepositoryList
+        repositories={viewer.repositories}
+        fetchMore={fetchMore}
+      />
     </Box>
   );
 }

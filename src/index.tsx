@@ -9,11 +9,7 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
-} from "@apollo/client";
+import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
 import { HttpLink } from "@apollo/client/link/http";
 import { ApolloLink } from "@apollo/client";
@@ -31,7 +27,20 @@ const httpLink = new HttpLink({
 });
 
 // Creating the cache as the place where the data is managed in Apollo Client.
-const cache = new InMemoryCache();
+const cache = new InMemoryCache({
+  typePolicies: {
+    Query: {
+      fields: {
+        viewer: {
+          merge(existing = {}, incoming) {
+            console.log(Object.keys(incoming));
+            return { ...existing, ...incoming };
+          },
+        },
+      },
+    },
+  },
+});
 
 // Handling errors on application level
 const errorLink = onError(({ graphQLErrors, networkError }) => {
