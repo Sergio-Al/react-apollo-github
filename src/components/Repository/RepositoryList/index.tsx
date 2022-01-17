@@ -3,11 +3,6 @@ import Button from "@mui/material/Button";
 import RepositoryItem from "../RepositoryItem";
 import { EdgesRepository, Repositories } from "../../../utils/types";
 import { useTheme } from "@mui/material";
-import {
-  FetchMoreQueryOptions,
-  OperationVariables,
-  FetchMoreOptions,
-} from "@apollo/client";
 
 export default function RepositoryList({
   repositories,

@@ -223,7 +223,6 @@ function RemoveStar({ id, stargazers }: { id: string; stargazers: number }) {
   const [removeStar, { loading, error }] = useMutation(REMOVE_STAR_REPOSITORY, {
     onError: () => setOpen(true),
   });
-  console.log("remove star fired!");
 
   return (
     <>

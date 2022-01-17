@@ -73,6 +73,13 @@ export const SUBSCRIBE_REPO_HANDLING = gql`
       subscribable {
         viewerSubscription
         id
+        ... on Repository {
+          id
+          name
+          watchers {
+            totalCount
+          }
+        }
       }
     }
   }
