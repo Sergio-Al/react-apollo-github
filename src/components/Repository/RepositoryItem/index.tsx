@@ -12,6 +12,7 @@ import MenuItem from "@mui/material/MenuItem";
 import {
   NodeEdgesRepository,
   viewerSubscriptionStatuses,
+  WatchersNodeEdgesRepository,
 } from "../../../utils/types";
 import { useTheme } from "@mui/system";
 import {
@@ -93,9 +94,13 @@ function StarButton({
 function SubscribeButton({
   id,
   message,
+  name,
+  watchers,
 }: {
   id: string;
   message: viewerSubscriptionStatuses;
+  name: string;
+  watchers: WatchersNodeEdgesRepository;
 }) {
   const [openError, setOpenError] = useState(false);
   const [subscribeUpdate, { loading, error }] = useMutation(
@@ -119,6 +124,8 @@ function SubscribeButton({
           subscribable: {
             viewerSubscription: subscribeState,
             id,
+            name,
+            watchers,
             __typename: "Repository",
           },
           __typename: "UpdateSubscriptionPayload",
@@ -332,7 +339,12 @@ export default function RepositoryItem({
           ) : (
             <AddStar id={id} stargazers={stargazers.totalCount} />
           )}
-          <SubscribeButton id={id} message={viewerSubscription} />
+          <SubscribeButton
+            id={id}
+            name={name}
+            watchers={watchers}
+            message={viewerSubscription}
+          />
           <Typography variant="body2">
             Watchers: {watchers.totalCount}
           </Typography>

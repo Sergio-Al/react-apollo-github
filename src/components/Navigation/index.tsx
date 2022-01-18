@@ -5,8 +5,6 @@ import TextField from "@mui/material/TextField";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import Box from "@mui/material/Box";
 import * as routes from "../../constants/routes";
-import { StringValueNode } from "graphql";
-
 const RouterLink = ({ children, to }: { children?: JSX.Element; to: any }) => (
   <Link to={to} style={{ textDecoration: "none" }}>
     {children}
@@ -14,28 +12,27 @@ const RouterLink = ({ children, to }: { children?: JSX.Element; to: any }) => (
 );
 
 function OrganizationSearch({
-  search,
-  setSearch,
+  defaultSearch,
   onSubmitForm,
 }: {
-  search: string;
-  setSearch: React.Dispatch<React.SetStateAction<string>>;
-  onSubmitForm: React.FormEventHandler<HTMLFormElement>;
+  defaultSearch: string;
+  onSubmitForm: (newValue: string) => void;
 }) {
-  //const [search, setSearch] = useState("");
-  // const myTemporaly = (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   console.log(`Sending ${search}`);
-  // };
+  const [localSearch, setLocalSearch] = useState(defaultSearch);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    onSubmitForm(localSearch.trim());
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setSearch(e.currentTarget.value);
+    setLocalSearch(e.currentTarget.value);
   };
 
   return (
-    <form onSubmit={onSubmitForm}>
+    <form onSubmit={handleSubmit}>
       <Box
         sx={{
           my: 2,
@@ -48,7 +45,7 @@ function OrganizationSearch({
           required
           id="outlined-required"
           label="Required"
-          defaultValue={search}
+          defaultValue={localSearch}
           onChange={handleChange}
         />
         <Button type="submit" variant="contained">
@@ -60,13 +57,11 @@ function OrganizationSearch({
 }
 
 export default function Navigation({
-  search,
-  setSearch,
+  defaultSearch,
   onSubmit,
 }: {
-  search: string;
-  setSearch: React.Dispatch<React.SetStateAction<string>>;
-  onSubmit: React.FormEventHandler<HTMLFormElement>;
+  defaultSearch: string;
+  onSubmit: (newValue: string) => void;
 }) {
   const location = useLocation();
   console.log(location);
@@ -94,8 +89,7 @@ export default function Navigation({
       {location.pathname !== "/profile" && (
         <OrganizationSearch
           onSubmitForm={onSubmit}
-          setSearch={setSearch}
-          search={search}
+          defaultSearch={defaultSearch}
         />
       )}
     </Box>

@@ -11,7 +11,7 @@ import { PaletteMode } from "@mui/material";
 import Profile from "./components/Profile";
 import Container from "@mui/material/Container";
 import { BrowserRouter } from "react-router-dom";
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { ORGANIZATION, PROFILE } from "./constants/routes";
 import Organization from "./components/Organization";
 import Navigation from "./components/Navigation";
@@ -57,12 +57,10 @@ const ColorModeContext = React.createContext({ toggleColorMode: () => {} });
 function CustomApp() {
   const theme = useTheme();
   const colorMode = React.useContext(ColorModeContext);
-  const [searchValue, setSearchValue] = useState("facebook");
   const [value, setValue] = useState("facebook");
 
-  const handleSearch = (e: React.ChangeEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setValue(searchValue);
+  const handleSearch = (newValue: string) => {
+    setValue(newValue);
   };
 
   return (
@@ -94,11 +92,7 @@ function CustomApp() {
         </IconButton>
       </Typography>
       <Container maxWidth="xl" sx={{ my: "12px", textAlign: "center" }}>
-        <Navigation
-          search={searchValue}
-          setSearch={setSearchValue}
-          onSubmit={handleSearch}
-        />
+        <Navigation defaultSearch={value} onSubmit={handleSearch} />
         <Routes>
           <Route
             path={ORGANIZATION}

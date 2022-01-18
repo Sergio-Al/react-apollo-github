@@ -11,7 +11,7 @@ export default function RepositoryList({
   repositories: Repositories;
   fetchMore: any;
 }) {
-  console.log("MY EDGES", repositories.edges);
+  console.log("Repositories:", repositories.edges);
   const theme = useTheme();
   return (
     <Grid
