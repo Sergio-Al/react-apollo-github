@@ -48,3 +48,22 @@ export type Repositories = {
   edges: Array<EdgesRepository>;
   pageInfo: PageInfoRepository;
 };
+
+// Issues
+
+export type Issues = {
+  edges: Array<EdgesIssues>;
+};
+
+export type EdgesIssues = {
+  node: NodeIssues;
+};
+
+export type NodeIssues = {
+  id: string;
+  number: number;
+  state: string;
+  title: string;
+  url: string;
+  body: string;
+};

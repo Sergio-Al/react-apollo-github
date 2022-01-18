@@ -52,6 +52,25 @@ export const GET_REPOSITORIES_OF_ORGANIZATION = gql`
   ${REPOSITORY_FRAGMENT}
 `;
 
+export const GET_ISSUES_OF_REPOSITORY = gql`
+  query ($repositoryOwner: String!, $repositoryName: String!) {
+    repository(name: $repositoryName, owner: $repositoryOwner) {
+      issues(first: 2, orderBy: { field: CREATED_AT, direction: DESC }) {
+        edges {
+          node {
+            id
+            number
+            state
+            title
+            url
+            body
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const STAR_REPOSITORY = gql`
   mutation ($id: ID!) {
     addStar(input: { starrableId: $id }) {

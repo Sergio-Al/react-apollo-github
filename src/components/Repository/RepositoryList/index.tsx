@@ -1,6 +1,7 @@
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import RepositoryItem from "../RepositoryItem";
+import Issues from "../../Issue";
 import { EdgesRepository, Repositories } from "../../../utils/types";
 import { useTheme } from "@mui/material";
 
@@ -26,6 +27,10 @@ export default function RepositoryList({
       {repositories.edges.map(({ node }: EdgesRepository) => (
         <Grid item lg={6} key={node.id}>
           <RepositoryItem {...node}></RepositoryItem>
+          <Issues
+            repositoryName={node.name}
+            repositoryOwner={node.owner.login}
+          />
         </Grid>
       ))}
       {repositories.pageInfo.hasNextPage && (

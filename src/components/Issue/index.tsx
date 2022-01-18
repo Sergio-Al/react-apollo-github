@@ -1,5 +1,3 @@
-import Typography from "@mui/material/Typography";
+import Issues from "./IssueList";
 
-export default function Issue() {
-  return <Typography variant="h3">Issue Component</Typography>;
-}
+export default Issues;
