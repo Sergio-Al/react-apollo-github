@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import IconButton from "@mui/material/IconButton";
 import Box from "@mui/material/Box";
 import { useTheme, ThemeProvider, createTheme } from "@mui/material/styles";
@@ -10,6 +10,11 @@ import { amber, grey } from "@mui/material/colors";
 import { PaletteMode } from "@mui/material";
 import Profile from "./components/Profile";
 import Container from "@mui/material/Container";
+import { BrowserRouter } from "react-router-dom";
+import { Routes, Route, Link } from "react-router-dom";
+import { ORGANIZATION, PROFILE } from "./constants/routes";
+import Organization from "./components/Organization";
+import Navigation from "./components/Navigation";
 
 const getDesignTokens = (mode: PaletteMode) => ({
   palette: {
@@ -52,6 +57,14 @@ const ColorModeContext = React.createContext({ toggleColorMode: () => {} });
 function CustomApp() {
   const theme = useTheme();
   const colorMode = React.useContext(ColorModeContext);
+  const [searchValue, setSearchValue] = useState("facebook");
+  const [value, setValue] = useState("facebook");
+
+  const handleSearch = (e: React.ChangeEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setValue(searchValue);
+  };
+
   return (
     <Box
       sx={{
@@ -81,7 +94,18 @@ function CustomApp() {
         </IconButton>
       </Typography>
       <Container maxWidth="xl" sx={{ my: "12px", textAlign: "center" }}>
-        <Profile />
+        <Navigation
+          search={searchValue}
+          setSearch={setSearchValue}
+          onSubmit={handleSearch}
+        />
+        <Routes>
+          <Route
+            path={ORGANIZATION}
+            element={<Organization organizationName={value} />}
+          />
+          <Route path={PROFILE} element={<Profile />} />
+        </Routes>
       </Container>
     </Box>
   );
@@ -104,9 +128,11 @@ function App() {
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Box>
-          <CustomApp />
-        </Box>
+        <BrowserRouter>
+          <Box>
+            <CustomApp />
+          </Box>
+        </BrowserRouter>
       </ThemeProvider>
     </ColorModeContext.Provider>
   );

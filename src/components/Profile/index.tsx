@@ -12,8 +12,6 @@ export default function Profile() {
 
   if (loading) return <SkeletonProfile />;
   if (error) return <Error error={error} />;
-  console.log(data);
-
   let { viewer } = data;
   return (
     <Box>

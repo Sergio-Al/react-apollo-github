@@ -30,6 +30,11 @@ const httpLink = new HttpLink({
 // Creating the cache as the place where the data is managed in Apollo Client.
 const cache = new InMemoryCache({
   typePolicies: {
+    Organization: {
+      fields: {
+        repositories: relayStylePagination(),
+      },
+    },
     User: {
       fields: {
         repositories: relayStylePagination(),

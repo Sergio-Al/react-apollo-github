@@ -289,7 +289,7 @@ export default function RepositoryItem({
               }}
               gutterBottom
             >
-              {primaryLanguage.name}
+              {primaryLanguage ? primaryLanguage.name : "Other"}
             </Typography>
           </Box>
           <Box

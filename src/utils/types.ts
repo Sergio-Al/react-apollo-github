@@ -27,7 +27,7 @@ export type NodeEdgesRepository = {
   name: string;
   descriptionHTML: string;
   owner: OwnerNodeEdgesRepository;
-  primaryLanguage: PrimaryLanguageNodeEdgesRepository;
+  primaryLanguage: PrimaryLanguageNodeEdgesRepository | null;
   stargazers: StargazersNodeEdgesRepository;
   url: string;
   viewerHasStarred: boolean;
