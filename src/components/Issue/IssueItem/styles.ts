@@ -5,6 +5,7 @@ export const IssueGrid = styled(Grid)(({ theme }) => {
   return {
     margin: "auto",
     maxWidth: "626px",
+    
     [theme.breakpoints.down("md")]: {
       maxWidth: "90vw",
       height: "auto",

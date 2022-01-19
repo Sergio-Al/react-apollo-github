@@ -67,3 +67,5 @@ export type NodeIssues = {
   url: string;
   body: string;
 };
+
+export type ISSUE_STATES = "NONE" | "OPEN" | "CLOSED";
