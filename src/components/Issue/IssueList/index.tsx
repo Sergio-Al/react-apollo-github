@@ -26,7 +26,11 @@ export default function Issues({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const { loading, error, data } = useQuery(GET_ISSUES_OF_REPOSITORY, {
-    variables: { repositoryName, repositoryOwner },
+    variables: {
+      repositoryName,
+      repositoryOwner,
+      issueState: issueState === "NONE" ? "OPEN" : issueState,
+    },
   });
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -43,17 +47,12 @@ export default function Issues({
   };
 
   if (loading) return <Typography>Loading...</Typography>;
-  if (error) return <Typography>Error: Something happened</Typography>;
+  if (error) {
+    console.log(error.message);
+    return <Typography>Error: Something happened</Typography>;
+  }
 
   const { repository } = data;
-
-  const filteredRepositories = {
-    issues: {
-      edges: repository.issues.edges.filter(
-        (issue: EdgesIssues) => issue.node.state === issueState
-      ),
-    },
-  };
 
   return (
     <Box sx={{ my: "1rem" }}>
@@ -78,7 +77,7 @@ export default function Issues({
         <MenuItem onClick={() => handleSelection("CLOSED")}>CLOSE</MenuItem>
         <MenuItem onClick={() => handleSelection("NONE")}>NONE</MenuItem>
       </Menu>
-      {isShow(issueState) && <IssueList issues={filteredRepositories.issues} />}
+      {isShow(issueState) && <IssueList issues={repository.issues} />}
     </Box>
   );
 }

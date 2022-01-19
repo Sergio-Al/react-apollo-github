@@ -23,7 +23,12 @@ export default function IssueItem({ issue }: { issue: NodeIssues }) {
           <Typography variant="caption" display="block" gutterBottom>
             State: {issue.state}
           </Typography>
-          <Link href={issue.url} underline="none">
+          <Link
+            underline="none"
+            target="_blank"
+            rel="noreferrer"
+            href={issue.url}
+          >
             <Button variant="contained">Visit</Button>
           </Link>
         </Grid>

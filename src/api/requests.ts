@@ -53,22 +53,22 @@ export const GET_REPOSITORIES_OF_ORGANIZATION = gql`
 `;
 
 export const GET_ISSUES_OF_REPOSITORY = gql`
-  query ($repositoryOwner: String!, $repositoryName: String!) {
-    repository(name: $repositoryName, owner: $repositoryOwner) {
-      issues(first: 2, orderBy: { field: CREATED_AT, direction: DESC }) {
-        edges {
-          node {
-            id
-            number
-            state
-            title
-            url
-            body
-          }
+query ($repositoryOwner: String!, $repositoryName: String!, $issueState: IssueState!) {
+  repository(name: $repositoryName, owner: $repositoryOwner) {
+    issues(first: 2, orderBy: {field: CREATED_AT, direction: DESC}, states: [$issueState]) {
+      edges {
+        node {
+          id
+          number
+          state
+          title
+          url
+          body
         }
       }
     }
   }
+}
 `;
 
 export const STAR_REPOSITORY = gql`
